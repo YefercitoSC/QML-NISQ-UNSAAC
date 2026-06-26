@@ -1,0 +1,26 @@
+# Exclusiones de la Suite de Simulación QML UNSAAC
+
+# Guiones y resúmenes de exposición (solicitado)
+rol_exposicion.md
+
+# Archivos de entorno virtual de Python
+venv/
+.venv/
+env/
+
+# Cache y archivos temporales de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Archivos de Jupyter Notebook locales
+.ipynb_checkpoints/
+
+# Configuraciones de editores y sistemas locales
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.gemini/

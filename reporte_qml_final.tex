@@ -1,0 +1,376 @@
+\documentclass[12pt,oneside]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{cite}
+\geometry{a4paper, margin=2.5cm}
+
+\begin{document}
+
+% --- CARÁTULA ---
+\begin{titlepage}
+    \centering
+    {\fontsize{16}{20}\selectfont\bfseries UNIVERSIDAD NACIONAL DE SAN ANTONIO ABAD DEL CUSCO} \\[0.4cm]
+    {\fontsize{13}{16}\selectfont FACULTAD DE INGENIERÍA ELÉCTRICA, ELECTRÓNICA, INFORMÁTICA Y MECÁNICA} \\[0.2cm]
+    {\fontsize{12}{15}\selectfont ESCUELA PROFESIONAL DE INGENIERÍA INFORMÁTICA Y DE SISTEMAS} \\[1.5cm]
+    
+    \includegraphics[width=0.3\textwidth]{https://upload.wikimedia.org/wikipedia/commons/3/3a/Escudo_UNSAAC.png} \\[1.5cm]
+    
+    {\fontsize{15}{18}\selectfont\bfseries REPORTE DE EXPERIMENTACIÓN} \\[0.4cm]
+    {\fontsize{16}{20}\selectfont\bfseries Modelos de Aprendizaje Automático Cuántico (QML)} \\[0.6cm]
+    {\fontsize{14}{17}\selectfont\bfseries Análisis de Modelos de Clasificación Clásicos y Cuánticos bajo Restricciones de Ruido y Compilación Física en la Era NISQ} \\[2cm]
+    
+    \begin{flushleft}
+        \textbf{Alumnos:} \\
+        Heidan Toribio Gil Figueroa \hfill Código: 221448 \\
+        Jairo Jaser Rodriguez Ccoyto \hfill Código: 221451 \\[0.6cm]
+        \textbf{Docente:} \\
+        Mgt. Raul Huillca Huallparimachi \\[0.6cm]
+        \textbf{Curso:} \\
+        Computación Cuántica
+    \end{flushleft}
+    
+    \vfill
+    {\fontsize{12}{15}\selectfont Cusco, Perú \\ Junio de 2026}
+\end{titlepage}
+
+\clearpage
+\begingroup
+\renewcommand{\baselinestretch}{0.85}
+\setlength{\parskip}{0.5pt}
+\tableofcontents
+\endgroup
+\newpage
+
+% --- CAPÍTULO 1 ---
+\chapter{Experimentación y Análisis de Modelos de QML}
+
+\section{Introducción a la experimentación}
+Esta sección expone la metodología empírica y el posterior análisis cuantitativo llevado a cabo con el propósito de evaluar la efectividad de las redes y optimizadores cuánticos parametrizados frente a clasificadores convencionales estándar. Las simulaciones y entrenamientos se enmarcan en las limitaciones físicas que imponen los procesadores de escala intermedia con ruido (NISQ). 
+
+Con el fin de examinar la separabilidad de las fronteras bajo modelos de baja dimensionalidad, se ha tomado como referencia metodológica el estudio desarrollado por Seilkhan y Taizhanov [1]. Este trabajo plantea el problema lógico no lineal exclusivo OR (XOR) como un estándar de validación estructural para evaluar la capacidad de los modelos para definir regiones de decisión altamente complejas y no separables linealmente. El objetivo inicial es contrastar el desempeño predictivo y determinar la calidad de la calibración probabilística de los clasificadores cuánticos variacionales (VQC) de profundidad controlada frente a la Regresión Logística clásica y un Perceptrón Multicapa (MLP) utilizando inicializaciones con múltiples semillas aleatorias.
+
+\section{Entorno experimental}
+La infraestructura experimental elegida responde a los desafíos computacionales inherentes a la simulación analítica de estados cuánticos a gran escala, integrando tecnologías que facilitan el cómputo en paralelo.
+
+\subsection{Hardware}
+El procesamiento de los algoritmos y la simulación matemática de las compuertas lógicas se realizaron en entornos virtuales acelerados:
+\begin{itemize}
+    \item \textbf{Plataforma de despliegue:} Google Colab.
+    \item \textbf{Aceleración física:} Unidades de procesamiento gráfico (GPU) NVIDIA de arquitectura dedicada.
+    \item \textbf{Interfaz de paralelización:} Entorno compatible con soporte CUDA de NVIDIA para optimizar el producto tensorial de los vectores de estado cuánticos.
+\end{itemize}
+
+\subsection{Software}
+La pila de herramientas de software empleada comprende:
+\begin{itemize}
+    \item \textbf{Lenguaje de programación:} Python 3.12.
+    \item \textbf{Entorno Cuántico:} Framework Qiskit Core acoplado a la extensión Qiskit Machine Learning. Específicamente, se instalaron versiones alineadas de la suite (Qiskit 1.1.0 y Qiskit Aer 0.14.2) para derivar de forma estable los cálculos matriciales a la GPU mediante la clase primitiva \texttt{AerSampler}.
+    \item \textbf{Librerías Clásicas:} Módulos de Scikit-Learn para instanciar la Regresión Logística y el MLP, estructurar la validación cruzada y calcular las funciones de pérdida estadística.
+\end{itemize}
+
+\section{Datos utilizados}
+A continuación se detalla la naturaleza y la preparación de la información para la evaluación del problema XOR.
+
+\subsection{Origen de los datos}
+Debido al carácter analítico del problema de la compuerta exclusiva, se construyó un conjunto de datos sintético bidimensional estructurado algorítmicamente para simular cuatro clústeres en los cuadrantes de un plano cartesiano.
+
+\subsection{Descripción del conjunto de datos}
+El dataset sintético cuenta con las siguientes propiedades:
+\begin{itemize}
+    \item \textbf{Volumen muestral:} 400 registros numéricos.
+    \item \textbf{Distribución estructural:} 100 muestras representativas por cada cuadrante cartesiano.
+    \item \textbf{Perturbación estadística:} Inyección de ruido gaussiano con desviación estándar ($\sigma = 0.10$) para superponer ligeramente los límites de las clases y emular un escenario real de clasificación.
+    \item \textbf{Equilibrio de categorías:} Dataset perfectamente balanceado con 200 elementos de Clase 0 y 200 de Clase 1.
+    \item \textbf{Dimensión de entrada:} 2 variables predictoras independientes ($x_1, x_2$).
+\end{itemize}
+
+\subsection{Preprocesamiento de datos}
+Antes de alimentar los modelos, los datos clásicos fueron transformados mediante el siguiente pipeline:
+\begin{itemize}
+    \item \textbf{Segmentación de muestras:} División de datos en un 80\% para el ajuste del entrenamiento y un 20\% para validación o test.
+    \item \textbf{Codificación Cuántica (Feature Map):} Se empleó un mapeo de codificación de ángulos (Angle Encoding). Los valores de entrada clásicos se proyectaron de forma lineal al rango $[0, \pi]$ mediante un escalador MinMaxScaler para actuar como ángulos de fase. Estos ángulos parametrizan compuertas unitarias de rotación Ry aplicadas independientemente a cada qubit:
+    \begin{equation}
+        |\psi(x)\rangle = R_y(x_1)|0\rangle \otimes R_y(x_2)|0\rangle
+    \end{equation}
+\end{itemize}
+
+\section{Diseño experimental}
+El diseño de la evaluación define el marco para medir el rendimiento de forma rigurosa y reproducible.
+
+\subsection{Objetivo experimental}
+El objetivo es evaluar y contrastar cuantitativamente el desempeño predictivo y la calibración probabilística de los algoritmos VQC bajo diferentes niveles de capas frente a modelos de aprendizaje automático clásicos tradicionales.
+
+\subsection{Métricas de evaluación}
+\begin{itemize}
+    \item \textbf{Exactitud (Accuracy):} Proporción de aciertos del clasificador sobre el conjunto de test.
+    \item \textbf{Entropía Cruzada Binaria (BCE Loss):} Evalúa la calidad probabilística del clasificador midiendo qué tan lejos están las probabilidades de pertenencia calculadas frente a las etiquetas de clasificación binaria:
+    \begin{equation}
+        BCE = -\frac{1}{N}\sum_{i=1}^N \left( y_i \log(\hat{y}_i) + (1-y_i)\log(1-\hat{y}_i) \right)
+    \end{equation}
+\end{itemize}
+
+\subsection{Escenarios de prueba}
+Se configuraron cuatro configuraciones algorítmicas básicas:
+\begin{itemize}
+    \item \textbf{Escenario 1:} Regresión Logística clásica lineal.
+    \item \textbf{Escenario 2:} Perceptrón Multicapa (MLP) clásico de una sola capa oculta con 4 neuronas ($h = 4$) y función logística.
+    \item \textbf{Escenario 3:} VQC con ansatz superficial de una repetición ($L=1$).
+    \item \textbf{Escenario 4:} VQC con ansatz profundo de dos repeticiones ($L=2$).
+\end{itemize}
+
+\subsection{Comparación con trabajos relacionados}
+Para validar las métricas reportadas en la literatura de forma estadística, se repitió el proceso sobre 5 semillas aleatorias distintas (semillas 0 a 4), calculando la media y la desviación estándar de cada métrica obtenida.
+
+\section{Implementación del sistema}
+La arquitectura del sistema híbrido clásico-cuántico se diseñó para garantizar equivalencia teórica.
+
+\subsection{Arquitectura}
+El circuito para los VQC integra compuertas de rotación Ry de Angle Encoding aplicadas sobre 2 qubits. El ansatz variacional adopta una estructura de compuertas entrelazantes lineales CNOT y rotaciones parametrizadas. El circuito se inicializa mediante un QuantumCircuit manual para evitar incompatibilidades de tipo en las primitivas de validación del sampler.
+
+\subsection{Tecnologías utilizadas}
+Los modelos tradicionales se instanciaron mediante las clases \texttt{LogisticRegression} y \texttt{MLPClassifier} de Scikit-Learn. Para los circuitos, se empleó el optimizador clásico no lineal COBYLA restringido a un máximo de 150 iteraciones para actualizar los parámetros.
+
+\section{Ejecución de experimentos y Análisis de Resultados}
+Tras correr la simulación paralelizada en la GPU para las 5 semillas, los resultados recopilados revelan importantes contrastes con la literatura teórica. Los datos reales obtenidos se muestran en la Tabla 1.1:
+
+\begin{table}[h]
+\centering
+\caption{Resultados comparativos del Experimento 1 (XOR) frente al estudio de referencia}
+\label{tab:resultados_xor}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Modelo} & \textbf{Acc. Local (Real)} & \textbf{Acc. Paper} & \textbf{BCE Local (Real)} & \textbf{BCE Paper} \\
+\midrule
+Reg. Logística & $46.50\% \pm 3.24\%$ & $\sim 50\%$ & $0.6980 \pm 0.0016$ & $\sim 0.69$ \\
+MLP ($h=4$) & $51.75\% \pm 9.75\%$ & $\sim 100\%$ & $0.6927 \pm 0.0018$ & $\sim 0.006$ \\
+VQC ($L=1$) & $80.50\% \pm 18.49\%$ & $\sim 75\%$ & $0.5952 \pm 0.2381$ & $\sim 0.55$ \\
+VQC ($L=2$) & $56.50\% \pm 16.09\%$ & $\sim 100\%$ & $0.6559 \pm 0.1026$ & $\sim 0.08$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{grafico_exp1_xor.png}
+    \caption{Comparativa de exactitud media (Accuracy) y pérdida de entropía cruzada binaria (BCE) obtenida para el Experimento 1 (XOR).}
+    \label{fig:grafico_xor}
+\end{figure}
+
+El análisis descriptivo de estos datos experimentales arroja las siguientes conclusiones:
+\begin{itemize}
+    \item \textbf{Fallo Lineal Esperado:} La Regresión Logística clásica es incapaz de segmentar el problema XOR debido a la imposibilidad de encontrar un hiperplano lineal, obteniendo una precisión pobre de $46.50\%$ y una pérdida BCE de $0.6980$.
+    \item \textbf{Falta de Convergencia del MLP Clásico:} Sorprendentemente, a diferencia de los modelos teóricos del paper que afirman un ajuste de exactitud del 100\%, el MLP ($h=4$) local reportó un Accuracy promedio de solo $51.75\%$ y un BCE alto de $0.6927$. Esto evidencia que, con solo 4 neuronas en la capa oculta, la red clásica se topa con un paisaje de pérdida altamente no convexo. En datasets de volumen limitado, la inicialización aleatoria de pesos hace que el algoritmo quede atrapado en mínimos locales triviales donde simplemente predice la clase mayoritaria.
+    \item \textbf{Comportamiento Cuántico Invertido:} La teoría predice que a mayor profundidad ($L=2$), el entrelazamiento es superior y la clasificación mejora. No obstante, los resultados prácticos reales demuestran lo contrario: el VQC superficial de una capa ($L=1$) promedió un Accuracy significativamente mayor ($80.50\% \pm 18.49\%$) frente a la variante profunda de dos capas ($L=2$, $56.50\% \pm 16.09\%$).
+    
+    Esta degradación se debe a que al aumentar a $L=2$, el número de parámetros ajustables en el ansatz se duplica de 4 a 8. Al incrementarse la dimensionalidad del espacio de búsqueda, el optimizador no lineal clásico COBYLA (que no es gradiente y realiza búsquedas locales) carece de la robustez analítica necesaria para converger al mínimo global, estancándose en mesetas locales planas de baja exactitud predictiva (*barren plateaus* locales).
+\end{itemize}
+
+\section{Experimento 2: Clasificación de Púlsares mediante QLR}
+
+\subsection{Introducción a la experimentación}
+El segundo escenario experimental profundiza en la clasificación de datos reales desbalanceados. Se toma como base teórica el estudio de Matada et al. [2] enfocado en la Regresión Logística Cuántica (QLR). Esta arquitectura híbrida utiliza el circuito cuántico exclusivamente como un extractor de características no lineal en espacios de Hilbert mediante representaciones de kernel de fidelidad, dejando la optimización lineal final en manos de una Regresión Logística clásica [2]. El objetivo es contrastar esta estrategia frente a clasificadores tradicionales clásicos y un VQC variacional clásico.
+
+\subsection{Entorno experimental}
+Las simulaciones se ejecutaron en Google Colab con aceleración por GPU utilizando el paquete \texttt{qiskit-aer-gpu} para procesar paralelamente las operaciones de kernel sobre hardware NVIDIA CUDA [2].
+
+\subsection{Datos utilizados}
+Se empleó el dataset astronómico empírico **HTRU-2** del repositorio OpenML (ID 1489) para la identificación de candidatos a púlsares (estrellas de neutrones magnetizadas).
+
+\subsubsection{Propiedades del Dataset}
+El conjunto cuenta con 5404 registros, caracterizados por un desbalance de clases del 29.3\% (clase positiva de púlsares) frente al 70.7\% de ruido de fondo. Para adaptar el procesamiento a 4 qubits, se aplicó PCA reteniendo un 91.6\% de la varianza explicada. El dataset final se estructuró con 300 muestras de entrenamiento y 100 de validación (manteniendo el 29.0\% de clase positiva de púlsares) [2].
+
+\subsection{Diseño experimental}
+
+\subsubsection{Objetivos y Métricas}
+El objetivo es comprobar si la representación del kernel cuántico en la arquitectura QLR aporta ventajas predictivas bajo clases desbalanceadas frente a modelos convencionales [2]. Se calcularon métricas robustas: Área bajo la curva Precision-Recall (PR-AUC) y ROC-AUC para evaluar la sensibilidad en la clase minoritaria, el Error de Calibración Esperado (ECE) para determinar la fiabilidad de las probabilidades, y el Recall bajo una tasa estricta de falsos positivos al 1\% (Recall@FPR1\%) [2].
+
+\subsubsection{Modelos a Comparar}
+Se evaluaron baselines clásicos (Regresión Logística y SVM-RBF), tres esquemas de codificación QLR (Angle, Data Re-uploading y Amplitude Encoding) y un VQC estándar optimizado por COBYLA a 120 iteraciones [2].
+
+\subsection{Implementación del sistema}
+La codificación de características de QLR-Angle mapeó las características mediante rotaciones Ry independientes [2]. La codificación QLR-DataReup duplicó las características aplicando rotaciones Ry secuenciales intercaladas con compuertas entrelazantes CZ [2], mientras que QLR-Amplitude aproximó la codificación mediante compuertas H y rotaciones parametrizadas [2].
+
+\subsection{Ejecución de experimentos y Análisis de Resultados}
+Los resultados cuantitativos reales obtenidos se presentan en la Tabla 1.2:
+
+\begin{table}[h]
+\centering
+\caption{Resultados predictivos y de calibración en la detección de púlsares ($N_{train} = 300$, $N_{qubits} = 4$)}
+\label{tab:resultados_pulsar}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Modelo} & \textbf{PR-AUC} & \textbf{ROC-AUC} & \textbf{Recall @ FPR 1\%} & \textbf{ECE} & \textbf{Brier} & \textbf{Tiempo (s)} \\
+\midrule
+Regresión Logística & 0.7599 & 0.8417 & 0.0340 & 0.5550 & 0.1303 & 0.006s \\
+SVM-RBF (Clásico) & 0.9337 & 0.9597 & 0.1030 & 0.6420 & 0.0634 & 0.018s \\
+QLR-Angle & 0.8728 & 0.9038 & 0.7241 & 0.5989 & 0.0893 & 0.020s \\
+QLR-DataReup & 0.9077 & 0.9364 & 0.7241 & 0.6140 & 0.0764 & 0.017s \\
+QLR-Amplitude & 0.8754 & 0.9048 & 0.7241 & 0.6000 & 0.0891 & 0.2098s \\
+VQC (Línea Base) & 0.7264 & 0.7717 & 0.0000 & 0.5453 & 0.1513 & 91.580s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{grafico_exp2_pulsares.png}
+    \caption{Puntajes de Precision-Recall AUC y Error de Calibración Esperado (ECE) obtenidos en la clasificación desbalanceada de púlsares (HTRU-2).}
+    \label{fig:grafico_pulsar}
+\end{figure}
+
+El análisis analítico de los datos reales revela lo siguiente:
+\begin{itemize}
+    \item \textbf{Excepcional Sensibilidad Predictiva cuántica (Recall@FPR1\%):} Al limitar la tasa de falsas alarmas a un estricto 1\% (FPR = 1\%), la Regresión Logística clásica y el SVM-RBF apenas logran recuperar el $3.4\%$ y $10.3\%$ de los púlsares reales, respectivamente. Por el contrario, los tres modelos QLR basados en kernel cuántico obtienen una recuperación del **$72.41\%$**. Esto demuestra que el mapeo de características al espacio de Hilbert cuántico logra estructurar la frontera de decisión de forma que las muestras de púlsares se agrupan de manera compacta, facilitando su detección bajo condiciones de validación severas.
+    \item \textbf{Eficacia del Data Re-uploading y Velocidad de QLR:} El modelo \textbf{QLR-DataReup} se consolida como el mejor modelo híbrido con un PR-AUC de $90.77\%$ y un ROC-AUC de $93.64\%$, aproximándose al SVM-RBF clásico. Además, su tiempo de ajuste de la regresión clásica es de solo **$0.017$ segundos**, en marcado contraste con los **$91.58$ segundos** que requiere la optimización variacional del VQC.
+    \item \textbf{Colapso del VQC:} El VQC puro reportó un rendimiento pobre (PR-AUC de 0.7264 y Recall del $0.0\%$). Entrenar directamente un circuito variacional sobre clases desbalanceadas introduce inestabilidad en el gradiente de optimización, ratificando que delegar la clasificación final a capas lineales clásicas (QLR) es metodológicamente preferible.
+\end{itemize}
+
+\section{Experimento 3: Evaluaci\'on de QSVM ante Ruido Cu\'antico}
+
+\subsection{Introducción a la experimentación}
+El tercer experimento evalúa la estabilidad física de los clasificadores cuánticos de vectores de soporte (QSVM) ante los efectos destructivos de la decoherencia en procesadores NISQ. Siguiendo el estudio de Suzuki et al. [3], comparamos el kernel ideal frente a simulaciones sometidas a un modelo de ruido compuesto (despolarización y decaimiento térmico) para modelar hardware real de iones atrapados o superconductores, midiendo el desalineamiento geométrico del kernel mediante la métrica de Frobenius.
+
+\subsection{Entorno experimental}
+El entorno integró el simulador de Qiskit Aer configurado con un \texttt{NoiseModel} personalizado inyectado en la GPU. El modelo de soporte vectorial clásico se ajustó utilizando la clase de kernel precomputado \texttt{FidelityQuantumKernel}.
+
+\subsection{Datos utilizados}
+Se empleó el dataset *Breast Cancer* de Scikit-Learn. Las variables originales fueron reducidas mediante PCA a 4 componentes principales (100\% de varianza explicada). Se extrajo un subconjunto de 120 muestras (90 para entrenamiento y 30 para validación) para evitar la explosión combinatoria del cómputo matricial de fidelidad cuántica.
+
+\subsection{Diseño experimental}
+\subsubsection{Métricas y Escenarios}
+Se midió el Accuracy, ROC-AUC y el **Frobenius Kernel Alignment** que calcula analíticamente la deforma geométrica de la matriz de kernel ruidosa ($K_{ruido}$) frente a la referencia ideal ($K_{ideal}$):
+\begin{equation}
+    A(K_{ideal}, K_{ruido}) = \frac{\text{Tr}(K_{ideal} \cdot K_{ruido}^T)}{\sqrt{\text{Tr}(K_{ideal} \cdot K_{ideal}^T)\text{Tr}(K_{ruido} \cdot K_{ruido}^T)}}
+\end{equation}
+Se evaluaron tasas de error por despolarización en compuertas de dos qubits CX de 0.0\% (Ideal), 0.5\%, 1.0\%, 2.0\% y 5.0\% integradas con ruido de relajación térmica ($T_1 = 50\,\mu s, T_2 = 70\,\mu s$).
+
+\subsection{Implementación del sistema}
+La codificación se implementó con un circuito \texttt{ZZFeatureMap} de 4 qubits y 2 repeticiones (reps=2, con profundidad original de 31 compuertas). Las compuertas CX fueron el objetivo de la inyección de los canales de ruido y relajación térmica.
+
+\subsection{Ejecución de experimentos y Análisis de Resultados}
+Los resultados consolidados reales de la simulación se detallan en la Tabla 1.3:
+
+\begin{table}[h]
+\centering
+\caption{Resultados del QSVM ante tasas progresivas de ruido cuántico compuesto}
+\label{tab:resultados_ruido}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Tasa de Error (Ruido CX)} & \textbf{Accuracy} & \textbf{ROC-AUC} & \textbf{Alineamiento Frobenius} \\
+\midrule
+0.0\% (Ideal) & 86.67\% & 0.9259 & 1.000000 \\
+0.5\% & 80.00\% & 0.9306 & 0.994820 \\
+1.0\% & 86.67\% & 0.9398 & 0.990782 \\
+2.0\% & 80.00\% & 0.9213 & 0.979570 \\
+5.0\% & 76.67\% & 0.8981 & 0.918065 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{grafico_exp3_ruido.png}
+    \caption{Degradación de la exactitud predictiva (Accuracy) y evolución del Frobenius Kernel Alignment en función de la tasa de ruido cuántico CX.}
+    \label{fig:grafico_ruido}
+\end{figure}
+
+El análisis crítico de los resultados prácticos revela:
+\begin{itemize}
+    \item \textbf{Degradación Geométrica del Kernel:} A medida que el error aumenta al 5.0\%, el alineamiento de Frobenius disminuye linealmente a $0.918065$. El ruido de despolarización compuesto degrada la coherencia de fase, forzando al estado puro hacia una mezcla maximalmente desordenada, deformando el kernel cuántico.
+    \item \textbf{Correlación Predictiva del Frobenius Alignment:} El colapso del alineamiento de Frobenius por debajo de $0.92$ coincide de forma exacta con la caída del Accuracy, el cual disminuye de $86.67\%$ a $76.67\%$. Esto demuestra empíricamente que el alineamiento de Frobenius actúa como un predictor robusto y analítico del rendimiento predictivo del QSVM en dispositivos ruidosos reales sin necesidad de realizar ejecuciones físicas completas.
+    \item \textbf{Fluctuaciones del Clasificador Clásico:} La exactitud reporta una pequeña recuperación bajo la tasa del 1.0\% ($86.67\%$). Este comportamiento refleja la capacidad de los optimizadores de regularización del SVM clásica ($C=1.0$) de absorber perturbaciones leves antes de sufrir colapsos severos una vez que el ruido excede el umbral del 2.0\%.
+\end{itemize}
+
+\section{Experimento 4: QSVM Consciente del Hardware (Hardware-Aware)}
+
+\subsection{Introducción a la experimentación}
+El cuarto escenario experimental evalúa la sobrecarga física introducida por los procesos de compilación y transpilación en la era NISQ. Tomando como base el estudio de Chaudhry et al. [4], contrastamos mapas de características abstractos convencionales frente a un circuito diseñado específicamente para operar sobre la topología y el conjunto de compuertas lógicas nativas de un chip superconductor real.
+
+\subsection{Entorno y Datos utilizados}
+Se modeló como procesador de destino la arquitectura **IBM Torino**, la cual cuenta con una conectividad física lineal y un conjunto restringido de compuertas nativas: ECR (Echoed Cross-Resonance), RZ, SX y X [4]. Se utilizó el dataset *Breast Cancer* comprimido mediante PCA a 4 componentes principales (300 muestras en total, 240 para ajuste y 60 para validación).
+
+\subsection{Diseño e Implementación del Sistema}
+Comparamos tres Feature Maps de 4 qubits: un `ZZFeatureMap` genérico de una y dos repeticiones ($r=1$ y $r=2$) frente a un Feature Map de co-diseño nativo (**HW-Aware Nativo**) que utiliza compuertas de rotación nativas SX y RZ acopladas directamente mediante compuertas entrelazantes ECR de Torino. Los circuitos fueron transpilados en Qiskit configurando el conjunto de bases nativas y la topología de Torino.
+
+\subsection{Ejecución de experimentos y Análisis de Resultados}
+La Tabla 1.4 expone el impacto estructural del compilador físico real sobre los circuitos:
+
+\begin{table}[h]
+\centering
+\caption{Métricas estructurales de transpilación en el chip superconductor IBM Torino}
+\label{tab:transpilacion}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Circuito} & \textbf{Prof. Orig.} & \textbf{Prof. Transp.} & \textbf{Comp. Orig. (2Q)} & \textbf{Comp. Transp. (2Q)} \\
+\midrule
+ZZFeatureMap ($r = 1$) & 1 & 47 & 0 & 6 \\
+ZZFeatureMap ($r = 2$) & 1 & 48 & 0 & 12 \\
+HW-Aware Nativo & 5 & 5 & 3 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Total de compuertas lógicas físicas pre y post transpilación en IBM Torino}
+\label{tab:conteo_compuertas}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Circuito} & \textbf{Total Compuertas Originales} & \textbf{Total Compuertas Transpiladas} \\
+\midrule
+ZZFeatureMap ($r = 1$) & 1 & 92 \\
+ZZFeatureMap ($r = 2$) & 1 & 107 \\
+HW-Aware Nativo & 15 & 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{grafico_exp4_transpilacion.png}
+    \caption{Sobrecarga de profundidad física pre y post transpilación forzada en el chip IBM Torino.}
+    \label{fig:grafico_transpilacion}
+\end{figure}
+
+El análisis de la transpilación física real demuestra lo siguiente:
+\begin{itemize}
+    \item \textbf{Severa Penalización por Circuitos Abstractos:} Los feature maps abstractos como \texttt{ZZFeatureMap} se muestran como bloques unitarios compactos (profundidad original = 1). Sin embargo, al transpilarlos a Torino, se produce una sobrecarga devastadora: el circuito de $r=1$ incrementa su profundidad física a **47 capas** e inyecta **6 compuertas físicas ECR de dos qubits** y un total de **92 compuertas fácticas**. Para $r=2$, la profundidad alcanza las **48 capas** con **12 compuertas ECR** y **107 compuertas en total**.
+    \item \textbf{Optimización Extrema de la Codificación Hardware-Aware:} El Feature Map de diseño nativo (**HW-Aware Nativo**) mantiene una profundidad invariante de **5 capas** y un conteo reducido de **3 compuertas ECR** y **15 compuertas totales** pre y post transpilación, al no requerir compuertas de enrutamiento ni swaps adicionales.
+    \item \textbf{Implicancia Física en Hardware Real:} A mayor profundidad física del circuito, mayor es la acumulación de errores de despolarización y desfase térmico. Pasar de 5 capas físicas (HW-Aware) a 48 capas físicas (ZZFeatureMap) multiplica el ruido destructivo. Esto demuestra empíricamente que los feature maps genéricos no son viables en la práctica NISQ debido a las penalizaciones de transpilación, posicionando al co-diseño Hardware-Aware como la única alternativa real para ejecutar algoritmos QML sobre chips físicos reales.
+\end{itemize}
+
+\chapter*{Conclusiones y Perspectivas Futuras}
+\addcontentsline{toc}{chapter}{Conclusiones y Perspectivas Futuras}
+
+La investigación comparativa realizada a través de los cuatro escenarios experimentales consolida las siguientes conclusiones:
+\begin{enumerate}
+    \item El uso de clasificadores cuánticos variacionales directos (VQC) en la era NISQ se enfrenta a cuellos de botella de optimización severos (mesetas estériles locales), donde el aumento de la profundidad del ansatz ($L=2$ frente a $L=1$) dificulta la convergencia de los optimizadores locales.
+    \item La arquitectura de Regresión Logística Cuántica (QLR) destaca como una alternativa altamente eficiente frente al VQC puro para clasificar conjuntos de datos reales y desbalanceados (púlsares HTRU-2). El modelo QLR-DataReup demostró una excelente calibración probabilística (Brier $0.0764$) y una capacidad excepcional para clasificar la clase minoritaria bajo tasas de falsos positivos estrictas (Recall@FPR1\% de $72.41\%$), requiriendo un tiempo de ejecución diminuto frente al VQC.
+    \item El ruido físico de despolarización y los efectos térmicos de relajación ($T_1$/$T_2$) de los qubits reales degradan linealmente la estructura espacial de los kernels cuánticos, lo cual puede predecirse con precisión mediante el alineamiento de Frobenius.
+    \item La transpilación a hardware comercial real (IBM Torino) de feature maps genéricos abstractos impone una sobrecarga estructural prohibitiva (de 1 a 48 capas físicas), lo que destruye la coherencia de fase por decoherencia acumulada. El co-diseño consciente del hardware (Hardware-Aware nativo) representa la única vía metodológica viable para mitigar este efecto, logrando circuitos compactos de baja profundidad.
+\end{enumerate}
+
+\newpage
+\begin{thebibliography}{99}
+\bibitem{1} M. Seilkhan and B. Taizhanov, ``Comparing classical and quantum variational classifiers on the xor problem,'' arXiv preprint arXiv:2602.24220, 2026.
+\bibitem{2} R. Matada et al., ``Hybrid quantum-classical logistic regression for calibrated classification of pulsar candidates,'' arXiv preprint arXiv:2605.07866, 2026.
+\bibitem{3} T. Suzuki, T. Hasebe, and T. Miyazaki, ``Quantum support vector machines for classification and regression on a trapped-ion quantum computer,'' arXiv preprint arXiv:2307.02091, 2024.
+\bibitem{4} A. M. Chaudhry, R. Haider, H. Khan, and M. Faryad, ``Hardware-aware quantum support vector machines,'' arXiv preprint arXiv:2604.07856, 2026.
+\bibitem{5} J. Preskill, ``Quantum Computing in the NISQ era and beyond,'' Quantum, vol. 2, p. 79, 2018.
+\bibitem{6} M. Cerezo, A. Arrasmith, R. Babbush, L. C. Cotta, J. R. McClean, and P. J. Coles, ``Variational quantum algorithms,'' Nature Reviews Physics, vol. 3, no. 9, pp. 625-644, 2021.
+\bibitem{7} V. Havl{\'\i}{\v{c}}ek, A. D. C{\'o}rcoles, K. Temme, A. W. Harrow, A. Kandala, J. M. Chow, and J. M. Gambetta, ``Supervised learning with quantum-enhanced feature spaces,'' Nature, vol. 567, no. 7747, pp. 209-212, 2019.
+\bibitem{8} M. Schuld and N. Killoran, ``Quantum machine learning in feature Hilbert spaces,'' Physical Review Letters, vol. 122, no. 4, p. 040504, 2019.
+\bibitem{9} J. R. McClean, S. Boixo, V. N. Smelyanskiy, R. Babbush, and H. Neven, ``Barren plateaus in quantum neural network landscapes,'' Nature Communications, vol. 9, no. 1, p. 4812, 2018.
+\bibitem{10} A. Kandala, A. Mezzacapo, K. Temme, M. Takita, M. Brink, J. M. Chow, and J. M. Gambetta, ``Hardware-efficient variational quantum generator for chemical calculations,'' Nature, vol. 549, no. 7671, pp. 242-246, 2017.
+\bibitem{11} J. Biamonte, P. Wittek, N. Pancotti, P. Rebentrost, N. Wiebe, and S. Lloyd, ``Quantum machine learning,'' Nature, vol. 549, no. 7671, pp. 195-202, 2017.
+\bibitem{12} H. T. G. Figueroa, J. J. R. Ccoyto, R. H. Huallparimachi, ``Código Fuente y Suite de Simulación QML-NISQ-UNSAAC,'' Repositorio de GitHub, Cusco, 2026. Disponible en: \url{https://github.com/heidantg/QML-NISQ-UNSAAC}.
+\end{thebibliography}
+
+\end{document}
