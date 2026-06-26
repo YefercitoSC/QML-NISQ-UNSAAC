@@ -4,14 +4,7 @@ Este repositorio contiene la implementación reproducible y la documentación ac
 
 ---
 
-## 👥 Integrantes y Supervisión
-* **Alumnos:**
-  * Heidan Toribio Gil Figueroa (Código: 221448)
-  * Jairo Jaser Rodriguez Ccoyto (Código: 221451)
-* **Docente:** Mgt. Raul Huillca Huallparimachi
-* **Curso:** Computación Cuántica
 
----
 
 ## 📂 Archivos del Proyecto
 * [experimentos_qml_completos.py](file:///c:/Users/yefer/Desktop/Compu_cuantica_II/experimentos_qml_completos.py): Script de Python reproducible que ejecuta los experimentos y genera las tablas de datos y gráficos.
